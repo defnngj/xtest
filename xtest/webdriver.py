@@ -77,7 +77,7 @@ class TestCase(unittest.TestCase):
 
     def open(self, url):
         """打开浏览器"""
-        print("open", XTest.driver)
+        self.driver = XTest.driver
         XTest.driver.get(url)
 
     def close(self):
