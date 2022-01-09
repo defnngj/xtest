@@ -1,12 +1,13 @@
 import os
 import time
+import inspect
 import webbrowser
 import unittest
 from xtest.config import XTest
 from selenium import webdriver
 from xtest.runner.HTMLTestRunner import HTMLTestRunner
 
-browsers = ["chrome", "firefox"]
+browsers = ["chrome", "firefox", "gc", "ff"]
 
 
 def main(path=None, browser=None, debug=False, timeout=10, title=None, description=None):
@@ -20,14 +21,18 @@ def main(path=None, browser=None, debug=False, timeout=10, title=None, descripti
     :param description: 报告的描述
     :return:
     """
+    stack_t = inspect.stack()
+    ins = inspect.getframeinfo(stack_t[1][0])
+    run_path = os.path.dirname(os.path.abspath(ins.filename))
+
     # 全局启动浏览器
     if browser is None:
         browser = "chrome"
     if browser not in browsers:
         raise NameError(f"不支持{browser}浏览器.")
-    if browser == "chrome":
+    if browser in ["chrome", "gc"]:
         XTest.driver = webdriver.Chrome()
-    if browser == "firefox":
+    if browser in ["firefox", "ff"]:
         XTest.driver = webdriver.Firefox()
 
     # 全局超时时间
@@ -38,7 +43,7 @@ def main(path=None, browser=None, debug=False, timeout=10, title=None, descripti
     suit = unittest.defaultTestLoader.discover(start_dir=path)
 
     if debug is False:
-        reports_dir = os.path.join(path, "reports")
+        reports_dir = os.path.join(run_path, "reports")
         if os.path.exists(reports_dir) is False:
             os.mkdir(reports_dir)
 

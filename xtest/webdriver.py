@@ -19,7 +19,7 @@ LOCATOR_LIST = {
 }
 
 
-class TestCase(unittest.TestCase):
+class WebDriver:
 
     def __wait_element(self, by, value):
         """
@@ -35,7 +35,7 @@ class TestCase(unittest.TestCase):
         except TimeoutException:
             raise TimeoutException("查找元素超时")
 
-    def __find_element(self, **kwargs):
+    def __find_element(self, index, **kwargs):
         if not kwargs:
             raise ValueError("Please specify a locator")
         if len(kwargs) > 1:
@@ -48,29 +48,37 @@ class TestCase(unittest.TestCase):
             raise ValueError("Element positioning of type '{}' is not supported. ".format(by))
 
         if by == "id_":
-            self.__wait_element(By.ID, value)
-            elem = XTest.driver.find_element(By.ID, value)
+            if index is None:
+                self.__wait_element(By.ID, value)
+            elem = XTest.driver.find_elements(By.ID, value)
         elif by == "name":
-            self.__wait_element(By.NAME, value)
-            elem = XTest.driver.find_element(By.NAME, value)
+            if index is None:
+                self.__wait_element(By.NAME, value)
+            elem = XTest.driver.find_elements(By.NAME, value)
         elif by == "class_name":
-            self.__wait_element(By.CLASS_NAME, value)
-            elem = XTest.driver.find_element(By.CLASS_NAME, value)
+            if index is None:
+                self.__wait_element(By.CLASS_NAME, value)
+            elem = XTest.driver.find_elements(By.CLASS_NAME, value)
         elif by == "tag":
-            self.__wait_element(By.TAG_NAME, value)
-            elem = XTest.driver.find_element(By.TAG_NAME, value)
+            if index is None:
+                self.__wait_element(By.TAG_NAME, value)
+            elem = XTest.driver.find_elements(By.TAG_NAME, value)
         elif by == "xpath":
-            self.__wait_element(By.XPATH, value)
-            elem = XTest.driver.find_element(By.XPATH, value)
+            if index is None:
+                self.__wait_element(By.XPATH, value)
+            elem = XTest.driver.find_elements(By.XPATH, value)
         elif by == "link_text":
-            self.__wait_element(By.LINK_TEXT, value)
-            elem = XTest.driver.find_element(By.LINK_TEXT, value)
+            if index is None:
+                self.__wait_element(By.LINK_TEXT, value)
+            elem = XTest.driver.find_elements(By.LINK_TEXT, value)
         elif by == "partial_link_text":
-            self.__wait_element(By.PARTIAL_LINK_TEXT, value)
-            elem = XTest.driver.find_element(By.PARTIAL_LINK_TEXT, value)
+            if index is None:
+                self.__wait_element(By.PARTIAL_LINK_TEXT, value)
+            elem = XTest.driver.find_elements(By.PARTIAL_LINK_TEXT, value)
         elif by == "css":
-            self.__wait_element(By.CSS_SELECTOR, value)
-            elem = XTest.driver.find_element(By.CSS_SELECTOR, value)
+            if index is None:
+                self.__wait_element(By.CSS_SELECTOR, value)
+            elem = XTest.driver.find_elements(By.CSS_SELECTOR, value)
         else:
             raise ValueError(f"{by}类型不支持. ")
         return elem
@@ -124,7 +132,7 @@ class TestCase(unittest.TestCase):
         def click(self):
             self.elem.click()
 
-    def type(self, text, clear=False, enter=False, **kwargs):
+    def type(self, text, clear=False, enter=False, index=None, **kwargs):
         """
         输入
         :param text: 文本
@@ -133,40 +141,50 @@ class TestCase(unittest.TestCase):
         :param kwargs:
         :return:
         """
-        elem = self.__find_element(**kwargs)
+        elem = self.__find_element(index, **kwargs)
         if clear is True:
             elem.clear()
-        elem.send_keys(text)
+
+        if index is None:
+            index = 0
+        elem[index].send_keys(text)
         if enter is True:
             elem.send_keys("\n")
 
-    def click(self, **kwargs):
+    def click(self, index=None, **kwargs):
         """
         点击
         :param kwargs:
         :return:
         """
-        elem = self.__find_element(**kwargs)
-        elem.click()
+        elem = self.__find_element(index, **kwargs)
+        if index is None:
+            index = 0
+        elem[index].click()
 
-    def get_text(self, **kwargs):
+    def get_text(self, index=None, **kwargs):
         """
         获取元素的文本
         :param kwargs:
         :return:
         """
-        elem = self.__find_element(**kwargs)
-        return elem.text
+        elem = self.__find_element(index, **kwargs)
+        if index is None:
+            index = 0
+        return elem[index].text
 
+    @property
+    def get_title(self):
+        """
+        获取元素的标题
+        :return:
+        """
+        title = XTest.driver.title
+        return title
 
-
-
-
-
-
-
-
-
+    def get_elements(self, **kwargs):
+        elem = self.__find_element(None, **kwargs)
+        return elem
 
 
 
