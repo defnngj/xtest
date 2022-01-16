@@ -1,7 +1,9 @@
+import os
 import csv
 import json
 import warnings
 import codecs
+import inspect as sys_inspect
 from itertools import islice
 from functools import wraps
 from parameterized.parameterized import inspect
@@ -22,13 +24,30 @@ def file_data(file=None, line=0):
     """
     if file is None:
         raise FileNotFoundError("请指定数据文件")
-    file_type = file.split(".")[-1]
+    if os.path.isfile(file) is True:
+        file_path = file
+    else:
+        stack_t = sys_inspect.stack()
+        ins = sys_inspect.getframeinfo(stack_t[1][0])
+        file_dir = os.path.dirname(os.path.dirname(os.path.abspath(ins.filename)))
+
+        file_path = None
+        for root, dirs, files in os.walk(file_dir, topdown=False):
+            for f in files:
+                if f == file:
+                    file_path = os.path.join(root, file)
+                    break
+            else:
+                continue
+            break
+
+    file_type = file_path.split(".")[-1]
     if file_type == "json":
-        with open(file, 'r') as load_f:
+        with open(file_path, 'r') as load_f:
             load_dict = json.load(load_f)
         return data(load_dict)
     elif file_type == "csv":
-        csv_obj = csv.reader(codecs.open(file, 'r', 'utf_8_sig'))
+        csv_obj = csv.reader(codecs.open(file_path, 'r', 'utf_8_sig'))
         data_list = []
         for line in islice(csv_obj, line, None):
             data_list.append(line)

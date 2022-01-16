@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from xtest.runner import xtest_logger
 
 
 LOCATOR_LIST = {
@@ -85,6 +86,7 @@ class WebDriver:
 
     def open(self, url):
         """打开浏览器"""
+        xtest_logger.info(f"📖 打开网址:{url}")
         self.driver = XTest.driver
         XTest.driver.get(url)
 
@@ -141,6 +143,7 @@ class WebDriver:
         :param kwargs:
         :return:
         """
+        xtest_logger.info(f"✔️定位：{kwargs},  输入:{text}")
         elem = self.__find_element(index, **kwargs)
         if clear is True:
             elem.clear()
@@ -157,10 +160,22 @@ class WebDriver:
         :param kwargs:
         :return:
         """
+        xtest_logger.info(f"✔️定位：{kwargs},  点击")
         elem = self.__find_element(index, **kwargs)
         if index is None:
             index = 0
         elem[index].click()
+
+    def clear(self, index=None, **kwargs):
+        """
+        清除输入框
+        :param kwargs:
+        :return:
+        """
+        elem = self.__find_element(index, **kwargs)
+        if index is None:
+            index = 0
+        elem[index].clear()
 
     def get_text(self, index=None, **kwargs):
         """

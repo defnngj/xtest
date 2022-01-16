@@ -26,6 +26,9 @@ setup(
     install_requires=[
         'selenium>=4.0.0',
         'parameterized==0.8.1',
+        'colorama>=0.4.4',
+        'logzero>=1.7.0',
+        'webdriver_manager>=3.5.2',
     ],
     classifiers=[
         'Intended Audience :: Developers',
@@ -39,6 +42,10 @@ setup(
         "Topic :: Software Development :: Testing",
     ],
     py_modules=['whyteboard'],
+    entry_points='''
+        [console_scripts]
+        xtest=xtest.cli:main
+    ''',
     scripts=[
         'xtest/runner/html/charts_script.html',
         'xtest/runner/html/heading.html',
